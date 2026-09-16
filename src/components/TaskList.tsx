@@ -5,9 +5,12 @@ interface TaskListProps {
   tasks: Task[];
   categories: Category[];
   onToggle: (id: string) => void;
-  onUpdate: (id: string, patch: { title: string; time: string; categoryId: string }) => void;
+  onUpdate: (
+    id: string,
+    patch: { title: string; time: string; categoryId: string },
+  ) => Promise<void>;
   onDelete: (id: string) => void;
-  onCreateCategory: (label: string, swatchIndex: number) => Category;
+  onCreateCategory: (label: string, swatchIndex: number) => Promise<Category>;
 }
 
 export function TaskList({

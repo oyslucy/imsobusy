@@ -14,11 +14,12 @@ import type { AuthUser, ProfilePatch } from "@/lib/api";
 
 interface PlannerAppProps {
   user: AuthUser;
+  token: string;
   onLogout: () => void;
   onUpdateProfile: (patch: ProfilePatch) => Promise<AuthUser>;
 }
 
-export function PlannerApp({ user, onLogout, onUpdateProfile }: PlannerAppProps) {
+export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAppProps) {
   const {
     today,
     viewDate,
@@ -30,6 +31,7 @@ export function PlannerApp({ user, onLogout, onUpdateProfile }: PlannerAppProps)
     visibleTasks,
     doneCount,
     totalCount,
+    isLoading,
     toggleTask,
     addTask,
     updateTask,
@@ -37,7 +39,7 @@ export function PlannerApp({ user, onLogout, onUpdateProfile }: PlannerAppProps)
     addCategory,
     selectDate,
     goToMonth,
-  } = usePlanner();
+  } = usePlanner(token);
 
   const [isAdding, setIsAdding] = useState(false);
   const [view, setView] = useState<NavView>("home");
@@ -47,8 +49,8 @@ export function PlannerApp({ user, onLogout, onUpdateProfile }: PlannerAppProps)
     selectDate(date);
   }
 
-  function handleAddTask(input: Parameters<typeof addTask>[0]) {
-    addTask(input);
+  async function handleAddTask(input: Parameters<typeof addTask>[0]) {
+    await addTask(input);
     setIsAdding(false);
   }
 
@@ -89,31 +91,39 @@ export function PlannerApp({ user, onLogout, onUpdateProfile }: PlannerAppProps)
 
               <ProgressCard done={doneCount} total={totalCount} />
               <FilterTabs categories={categories} active={filter} onChange={setFilter} />
-              <TaskList
-                tasks={visibleTasks}
-                categories={categories}
-                onToggle={toggleTask}
-                onUpdate={updateTask}
-                onDelete={deleteTask}
-                onCreateCategory={addCategory}
-              />
 
-              {isAdding ? (
-                <AddTaskForm
-                  categories={categories}
-                  onAdd={handleAddTask}
-                  onCreateCategory={addCategory}
-                  onCancel={() => setIsAdding(false)}
-                />
+              {isLoading ? (
+                <div className="flex min-h-0 flex-1 items-center justify-center text-sm font-semibold text-neutral-400">
+                  불러오는 중...
+                </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => setIsAdding(true)}
-                  className="mt-3 rounded-2xl border-2 border-dashed border-ink py-3.5 text-center text-[13.5px] font-bold text-neutral-700"
-                >
-                  + 일정 추가하기
-                </button>
+                <TaskList
+                  tasks={visibleTasks}
+                  categories={categories}
+                  onToggle={toggleTask}
+                  onUpdate={updateTask}
+                  onDelete={deleteTask}
+                  onCreateCategory={addCategory}
+                />
               )}
+
+              {!isLoading &&
+                (isAdding ? (
+                  <AddTaskForm
+                    categories={categories}
+                    onAdd={handleAddTask}
+                    onCreateCategory={addCategory}
+                    onCancel={() => setIsAdding(false)}
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsAdding(true)}
+                    className="mt-3 rounded-2xl border-2 border-dashed border-ink py-3.5 text-center text-[13.5px] font-bold text-neutral-700"
+                  >
+                    + 일정 추가하기
+                  </button>
+                ))}
             </>
           ) : (
             <ProfileScreen user={user} onUpdate={onUpdateProfile} onLogout={onLogout} />

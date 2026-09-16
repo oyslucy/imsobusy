@@ -6,7 +6,7 @@ interface CategoryPickerProps {
   categories: Category[];
   selectedId: string;
   onSelect: (id: string) => void;
-  onCreateCategory: (label: string, swatchIndex: number) => Category;
+  onCreateCategory: (label: string, swatchIndex: number) => Promise<Category>;
 }
 
 export function CategoryPicker({
@@ -19,10 +19,10 @@ export function CategoryPicker({
   const [label, setLabel] = useState("");
   const [swatchIndex, setSwatchIndex] = useState(0);
 
-  function handleCreate() {
+  async function handleCreate() {
     const trimmed = label.trim();
     if (!trimmed) return;
-    const created = onCreateCategory(trimmed.toUpperCase(), swatchIndex);
+    const created = await onCreateCategory(trimmed.toUpperCase(), swatchIndex);
     onSelect(created.id);
     setLabel("");
     setSwatchIndex(0);

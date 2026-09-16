@@ -6,9 +6,12 @@ interface TaskItemProps {
   task: Task;
   categories: Category[];
   onToggle: (id: string) => void;
-  onUpdate: (id: string, patch: { title: string; time: string; categoryId: string }) => void;
+  onUpdate: (
+    id: string,
+    patch: { title: string; time: string; categoryId: string },
+  ) => Promise<void>;
   onDelete: (id: string) => void;
-  onCreateCategory: (label: string, swatchIndex: number) => Category;
+  onCreateCategory: (label: string, swatchIndex: number) => Promise<Category>;
 }
 
 export function TaskItem({
@@ -33,11 +36,11 @@ export function TaskItem({
     setIsEditing(true);
   }
 
-  function handleSave(e: FormEvent) {
+  async function handleSave(e: FormEvent) {
     e.preventDefault();
     const trimmed = title.trim();
     if (!trimmed || !categoryId) return;
-    onUpdate(task.id, { title: trimmed, time, categoryId });
+    await onUpdate(task.id, { title: trimmed, time, categoryId });
     setIsEditing(false);
   }
 

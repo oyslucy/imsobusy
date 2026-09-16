@@ -3,7 +3,7 @@ import { PlannerApp } from "@/PlannerApp";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function App() {
-  const { status, user, login, signup, logout, updateProfile } = useAuth();
+  const { status, user, token, login, signup, logout, updateProfile } = useAuth();
 
   if (status === "loading") {
     return (
@@ -13,9 +13,16 @@ export default function App() {
     );
   }
 
-  if (status === "guest" || !user) {
+  if (status === "guest" || !user || !token) {
     return <AuthScreen onLogin={login} onSignup={signup} />;
   }
 
-  return <PlannerApp user={user} onLogout={logout} onUpdateProfile={updateProfile} />;
+  return (
+    <PlannerApp
+      user={user}
+      token={token}
+      onLogout={logout}
+      onUpdateProfile={updateProfile}
+    />
+  );
 }

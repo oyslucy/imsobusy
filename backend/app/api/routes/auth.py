@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.security import create_access_token, verify_password
+from app.crud.category import seed_default_categories
 from app.crud.user import create_user, get_user_by_email
 from app.db.session import get_db
 from app.schemas.auth import LoginRequest, SignupRequest, TokenResponse
@@ -20,6 +21,7 @@ def signup(payload: SignupRequest, db: Session = Depends(get_db)) -> TokenRespon
     user = create_user(
         db, name=payload.name, email=payload.email, password=payload.password
     )
+    seed_default_categories(db, user.id)
     token = create_access_token(subject=user.id)
     return TokenResponse(access_token=token, user=user)
 

@@ -4,8 +4,8 @@ import { CategoryPicker } from "@/components/CategoryPicker";
 
 interface AddTaskFormProps {
   categories: Category[];
-  onAdd: (input: { title: string; time: string; categoryId: string }) => void;
-  onCreateCategory: (label: string, swatchIndex: number) => Category;
+  onAdd: (input: { title: string; time: string; categoryId: string }) => Promise<void>;
+  onCreateCategory: (label: string, swatchIndex: number) => Promise<Category>;
   onCancel: () => void;
 }
 
@@ -18,12 +18,18 @@ export function AddTaskForm({
   const [title, setTitle] = useState("");
   const [time, setTime] = useState("09:00");
   const [categoryId, setCategoryId] = useState(categories[0]?.id ?? "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const trimmed = title.trim();
     if (!trimmed || !categoryId) return;
-    onAdd({ title: trimmed, time, categoryId });
+    setIsSubmitting(true);
+    try {
+      await onAdd({ title: trimmed, time, categoryId });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -55,10 +61,10 @@ export function AddTaskForm({
       <div className="flex gap-2">
         <button
           type="submit"
-          disabled={!title.trim() || !categoryId}
+          disabled={!title.trim() || !categoryId || isSubmitting}
           className="flex-1 rounded-lg border-2 border-ink bg-yellow py-2 text-sm font-extrabold disabled:opacity-40"
         >
-          추가
+          {isSubmitting ? "추가 중..." : "추가"}
         </button>
         <button
           type="button"

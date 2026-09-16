@@ -52,6 +52,43 @@ export interface ProfilePatch {
   new_password?: string;
 }
 
+export interface ApiCategory {
+  id: string;
+  label: string;
+  bg: string;
+  text: string;
+}
+
+export interface ApiCategoryCreate {
+  label: string;
+  bg: string;
+  text: string;
+}
+
+export interface ApiTask {
+  id: string;
+  title: string;
+  time: string;
+  category_id: string;
+  done: boolean;
+  date: string;
+}
+
+export interface ApiTaskCreate {
+  title: string;
+  time: string;
+  category_id: string;
+  date: string;
+}
+
+export interface ApiTaskPatch {
+  title?: string;
+  time?: string;
+  category_id?: string;
+  done?: boolean;
+  date?: string;
+}
+
 export const api = {
   signup: (input: { name: string; email: string; password: string }) =>
     request<AuthResponse>("/auth/signup", {
@@ -73,4 +110,28 @@ export const api = {
       { method: "PATCH", body: JSON.stringify(patch) },
       token,
     ),
+
+  listCategories: (token: string) => request<ApiCategory[]>("/categories", {}, token),
+
+  createCategory: (token: string, input: ApiCategoryCreate) =>
+    request<ApiCategory>(
+      "/categories",
+      { method: "POST", body: JSON.stringify(input) },
+      token,
+    ),
+
+  listTasks: (token: string) => request<ApiTask[]>("/tasks", {}, token),
+
+  createTask: (token: string, input: ApiTaskCreate) =>
+    request<ApiTask>("/tasks", { method: "POST", body: JSON.stringify(input) }, token),
+
+  updateTask: (token: string, id: string, patch: ApiTaskPatch) =>
+    request<ApiTask>(
+      `/tasks/${id}`,
+      { method: "PATCH", body: JSON.stringify(patch) },
+      token,
+    ),
+
+  deleteTask: (token: string, id: string) =>
+    request<void>(`/tasks/${id}`, { method: "DELETE" }, token),
 };
