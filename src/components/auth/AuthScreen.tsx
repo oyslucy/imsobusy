@@ -1,25 +1,28 @@
 import { useState, type FormEvent } from "react";
+import { ApiError } from "@/lib/api";
 
 type Mode = "login" | "signup";
 
 interface AuthScreenProps {
-  onAuthenticated: () => void;
+  onLogin: (email: string, password: string) => Promise<void>;
+  onSignup: (name: string, email: string, password: string) => Promise<void>;
 }
 
-export function AuthScreen({ onAuthenticated }: AuthScreenProps) {
+export function AuthScreen({ onLogin, onSignup }: AuthScreenProps) {
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function switchMode(next: Mode) {
     setMode(next);
     setError("");
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -42,7 +45,18 @@ export function AuthScreen({ onAuthenticated }: AuthScreenProps) {
     }
 
     setError("");
-    onAuthenticated();
+    setIsSubmitting(true);
+    try {
+      if (mode === "login") {
+        await onLogin(email, password);
+      } else {
+        await onSignup(name.trim(), email, password);
+      }
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "요청 중 문제가 발생했어요");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -114,9 +128,10 @@ export function AuthScreen({ onAuthenticated }: AuthScreenProps) {
 
           <button
             type="submit"
-            className="mt-1 rounded-lg border-2 border-ink bg-yellow py-3 text-sm font-extrabold"
+            disabled={isSubmitting}
+            className="mt-1 rounded-lg border-2 border-ink bg-yellow py-3 text-sm font-extrabold disabled:opacity-50"
           >
-            {mode === "login" ? "로그인" : "회원가입"}
+            {isSubmitting ? "처리 중..." : mode === "login" ? "로그인" : "회원가입"}
           </button>
         </form>
 
