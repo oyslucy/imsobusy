@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Brand } from "@/components/Brand";
 import { Greeting } from "@/components/Greeting";
 import { CalendarCard } from "@/components/CalendarCard";
 import { ProgressCard } from "@/components/ProgressCard";
 import { FilterTabs } from "@/components/FilterTabs";
 import { TaskList } from "@/components/TaskList";
+import { AddTaskForm } from "@/components/AddTaskForm";
 import { Navbar } from "@/components/Navbar";
 import { usePlanner } from "@/hooks/usePlanner";
 import { toISODate } from "@/lib/calendar";
@@ -20,9 +22,22 @@ export default function App() {
     doneCount,
     totalCount,
     toggleTask,
+    addTask,
     selectDate,
     goToMonth,
   } = usePlanner();
+
+  const [isAdding, setIsAdding] = useState(false);
+
+  function handleSelectDate(date: Date) {
+    setIsAdding(false);
+    selectDate(date);
+  }
+
+  function handleAddTask(input: Parameters<typeof addTask>[0]) {
+    addTask(input);
+    setIsAdding(false);
+  }
 
   const pendingToday = (tasksByDate.get(toISODate(today)) ?? []).filter(
     (t) => !t.done,
@@ -39,7 +54,7 @@ export default function App() {
             today={today}
             selectedDate={selectedDate}
             tasksByDate={tasksByDate}
-            onSelectDate={selectDate}
+            onSelectDate={handleSelectDate}
             onGoToMonth={goToMonth}
           />
         </div>
@@ -61,9 +76,17 @@ export default function App() {
           <FilterTabs active={filter} onChange={setFilter} />
           <TaskList tasks={visibleTasks} onToggle={toggleTask} />
 
-          <div className="mt-3 rounded-2xl border-2 border-dashed border-ink py-3.5 text-center text-[13.5px] font-bold text-neutral-700">
-            + 일정 추가하기
-          </div>
+          {isAdding ? (
+            <AddTaskForm onAdd={handleAddTask} onCancel={() => setIsAdding(false)} />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsAdding(true)}
+              className="mt-3 rounded-2xl border-2 border-dashed border-ink py-3.5 text-center text-[13.5px] font-bold text-neutral-700"
+            >
+              + 일정 추가하기
+            </button>
+          )}
 
           <Navbar />
         </div>

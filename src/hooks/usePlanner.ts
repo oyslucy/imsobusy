@@ -38,6 +38,18 @@ export function usePlanner() {
     );
   }
 
+  function addTask(input: { title: string; time: string; tag: TaskTag }) {
+    const newTask: Task = {
+      id: crypto.randomUUID(),
+      title: input.title,
+      time: input.time,
+      tag: input.tag,
+      done: false,
+      date: selectedISO,
+    };
+    setTasks((prev) => [...prev, newTask]);
+  }
+
   function selectDate(date: Date) {
     setSelectedDate(date);
     if (
@@ -63,6 +75,7 @@ export function usePlanner() {
     doneCount,
     totalCount,
     toggleTask,
+    addTask,
     selectDate,
     goToMonth,
   };
