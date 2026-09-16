@@ -44,12 +44,13 @@ def post_task(
 ) -> TaskRead:
     _ensure_category_exists(db, current_user.id, payload.category_id)
     location = (payload.location or "").strip() or None
+    time = (payload.time or "").strip() or None
     return create_task(
         db,
         current_user.id,
         title=payload.title,
         location=location,
-        time=payload.time,
+        time=time,
         category_id=payload.category_id,
         date=payload.date,
     )
@@ -71,8 +72,8 @@ def patch_task(
         task.title = payload.title
     if "location" in payload.model_fields_set:
         task.location = (payload.location or "").strip() or None
-    if payload.time is not None:
-        task.time = payload.time
+    if "time" in payload.model_fields_set:
+        task.time = (payload.time or "").strip() or None
     if payload.done is not None:
         task.done = payload.done
     if payload.date is not None:

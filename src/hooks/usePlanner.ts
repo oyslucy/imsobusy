@@ -81,7 +81,7 @@ export function usePlanner(token: string) {
   async function addTask(input: {
     title: string;
     location: string;
-    time: string;
+    time: string | null;
     categoryId: string;
   }) {
     const created = await api.createTask(token, {
@@ -96,7 +96,7 @@ export function usePlanner(token: string) {
 
   async function updateTask(
     id: string,
-    patch: { title: string; location: string; time: string; categoryId: string },
+    patch: { title: string; location: string; time: string | null; categoryId: string },
   ) {
     const updated = await api.updateTask(token, id, {
       title: patch.title,

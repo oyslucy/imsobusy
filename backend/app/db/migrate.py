@@ -9,8 +9,56 @@ COLUMNS_TO_ENSURE: list[tuple[str, str, str]] = [
     ("tasks", "location", "VARCHAR(200)"),
 ]
 
+# Columns that used to be NOT NULL and now need to allow NULL. SQLite can't
+# drop a column constraint in place, so these tables get rebuilt: renamed
+# aside, recreated from the current model (already NULLable there), old
+# rows copied back over the columns both versions share, then dropped.
+COLUMNS_TO_RELAX: list[tuple[str, str]] = [
+    ("tasks", "time"),
+]
+
+
+def _is_not_null(engine: Engine, table: str, column: str) -> bool:
+    with engine.connect() as conn:
+        rows = conn.execute(text(f"PRAGMA table_info({table})")).fetchall()
+    return any(row[1] == column and row[3] for row in rows)
+
+
+def _relax_not_null_columns(engine: Engine) -> None:
+    from app.db.session import Base  # local import to avoid a circular import
+
+    inspector = inspect(engine)
+    for table, column in COLUMNS_TO_RELAX:
+        if not inspector.has_table(table) or not _is_not_null(engine, table, column):
+            continue
+
+        old_columns = [col["name"] for col in inspector.get_columns(table)]
+        old_index_names = [idx["name"] for idx in inspector.get_indexes(table)]
+        with engine.begin() as conn:
+            conn.execute(text(f"ALTER TABLE {table} RENAME TO {table}_old"))
+            # SQLite carries named indexes over on rename; drop them so
+            # create_all can recreate them under the same name for the
+            # rebuilt table below.
+            for index_name in old_index_names:
+                conn.execute(text(f"DROP INDEX {index_name}"))
+
+        Base.metadata.create_all(bind=engine, tables=[Base.metadata.tables[table]])
+
+        new_columns = {col["name"] for col in inspect(engine).get_columns(table)}
+        shared = [c for c in old_columns if c in new_columns]
+        cols_sql = ", ".join(shared)
+        with engine.begin() as conn:
+            conn.execute(
+                text(f"INSERT INTO {table} ({cols_sql}) SELECT {cols_sql} FROM {table}_old")
+            )
+            conn.execute(text(f"DROP TABLE {table}_old"))
+
+        inspector = inspect(engine)
+
 
 def run_light_migrations(engine: Engine) -> None:
+    _relax_not_null_columns(engine)
+
     inspector = inspect(engine)
     with engine.begin() as conn:
         for table, column, ddl_type in COLUMNS_TO_ENSURE:

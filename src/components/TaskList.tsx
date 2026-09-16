@@ -7,7 +7,7 @@ interface TaskListProps {
   onToggle: (id: string) => void;
   onUpdate: (
     id: string,
-    patch: { title: string; location: string; time: string; categoryId: string },
+    patch: { title: string; location: string; time: string | null; categoryId: string },
   ) => Promise<void>;
   onDelete: (id: string) => void;
   onCreateCategory: (label: string, swatchIndex: number) => Promise<Category>;

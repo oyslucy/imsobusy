@@ -22,7 +22,7 @@ def create_task(
     *,
     title: str,
     location: str | None,
-    time: str,
+    time: str | None,
     category_id: str,
     date: date_type,
 ) -> Task:

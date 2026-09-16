@@ -8,7 +8,7 @@ interface AddTaskFormProps {
   onAdd: (input: {
     title: string;
     location: string;
-    time: string;
+    time: string | null;
     categoryId: string;
   }) => Promise<void>;
   onCreateCategory: (label: string, swatchIndex: number) => Promise<Category>;
@@ -23,7 +23,7 @@ export function AddTaskForm({
 }: AddTaskFormProps) {
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
-  const [time, setTime] = useState("09:00");
+  const [time, setTime] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState(categories[0]?.id ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 

@@ -7,7 +7,7 @@ class TaskRead(BaseModel):
     id: str
     title: str
     location: str | None
-    time: str
+    time: str | None
     category_id: str
     done: bool
     date: DateType
@@ -18,7 +18,7 @@ class TaskRead(BaseModel):
 class TaskCreate(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     location: str | None = Field(default=None, max_length=200)
-    time: str = Field(min_length=1, max_length=5)
+    time: str | None = Field(default=None, max_length=5)
     category_id: str
     date: DateType
 
@@ -26,7 +26,7 @@ class TaskCreate(BaseModel):
 class TaskUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=200)
     location: str | None = Field(default=None, max_length=200)
-    time: str | None = Field(default=None, min_length=1, max_length=5)
+    time: str | None = Field(default=None, max_length=5)
     category_id: str | None = None
     done: bool | None = None
     date: DateType | None = None

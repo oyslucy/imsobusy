@@ -9,7 +9,7 @@ interface TaskItemProps {
   onToggle: (id: string) => void;
   onUpdate: (
     id: string,
-    patch: { title: string; location: string; time: string; categoryId: string },
+    patch: { title: string; location: string; time: string | null; categoryId: string },
   ) => Promise<void>;
   onDelete: (id: string) => void;
   onCreateCategory: (label: string, swatchIndex: number) => Promise<Category>;
@@ -130,7 +130,7 @@ export function TaskItem({
               {category.label}
             </span>
           )}
-          <span className="text-xs font-bold text-neutral-400">{task.time}</span>
+          {task.time && <span className="text-xs font-bold text-neutral-400">{task.time}</span>}
         </div>
       </div>
       <div className="flex shrink-0 gap-1.5">

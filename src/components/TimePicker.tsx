@@ -3,10 +3,11 @@ import { createPortal } from "react-dom";
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
 const MINUTES = ["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"];
+const DEFAULT_TIME = "09:00";
 
 interface TimePickerProps {
-  value: string;
-  onChange: (value: string) => void;
+  value: string | null;
+  onChange: (value: string | null) => void;
 }
 
 export function TimePicker({ value, onChange }: TimePickerProps) {
@@ -17,7 +18,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
   const hourListRef = useRef<HTMLDivElement>(null);
   const minuteListRef = useRef<HTMLDivElement>(null);
 
-  const [hour, minute] = value.split(":");
+  const [hour, minute] = (value ?? DEFAULT_TIME).split(":");
 
   useLayoutEffect(() => {
     if (!isOpen || !buttonRef.current) return;
@@ -51,15 +52,30 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
   }, [isOpen]);
 
   return (
-    <>
+    <div className="flex items-center gap-1.5">
       <button
         ref={buttonRef}
         type="button"
         onClick={() => setIsOpen((v) => !v)}
-        className="rounded-lg border-2 border-ink px-3 py-2 text-sm font-semibold outline-none"
+        className={
+          value
+            ? "rounded-lg border-2 border-ink px-3 py-2 text-sm font-semibold outline-none"
+            : "rounded-lg border-2 border-dashed border-ink px-3 py-2 text-sm font-semibold text-neutral-500 outline-none"
+        }
       >
-        {value}
+        {value ?? "🕐 시간 추가"}
       </button>
+
+      {value && (
+        <button
+          type="button"
+          onClick={() => onChange(null)}
+          aria-label="시간 제거"
+          className="flex h-7 w-7 items-center justify-center rounded-md border-2 border-ink bg-white text-xs text-neutral-500"
+        >
+          ✕
+        </button>
+      )}
 
       {isOpen &&
         createPortal(
@@ -101,6 +117,6 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
           </div>,
           document.body,
         )}
-    </>
+    </div>
   );
 }

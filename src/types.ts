@@ -9,7 +9,7 @@ export interface Task {
   id: string;
   title: string;
   location: string | null;
-  time: string;
+  time: string | null;
   categoryId: string;
   done: boolean;
   /** ISO date string (yyyy-mm-dd) the task belongs to */

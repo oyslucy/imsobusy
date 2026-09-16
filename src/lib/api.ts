@@ -69,7 +69,7 @@ export interface ApiTask {
   id: string;
   title: string;
   location: string | null;
-  time: string;
+  time: string | null;
   category_id: string;
   done: boolean;
   date: string;
@@ -78,7 +78,7 @@ export interface ApiTask {
 export interface ApiTaskCreate {
   title: string;
   location?: string | null;
-  time: string;
+  time?: string | null;
   category_id: string;
   date: string;
 }
@@ -86,7 +86,7 @@ export interface ApiTaskCreate {
 export interface ApiTaskPatch {
   title?: string;
   location?: string | null;
-  time?: string;
+  time?: string | null;
   category_id?: string;
   done?: boolean;
   date?: string;
