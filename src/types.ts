@@ -8,6 +8,7 @@ export interface Category {
 export interface Task {
   id: string;
   title: string;
+  location: string | null;
   time: string;
   categoryId: string;
   done: boolean;

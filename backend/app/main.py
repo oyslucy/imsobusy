@@ -6,10 +6,12 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api.routes import auth, categories, tasks, users
 from app.core.config import settings
+from app.db.migrate import run_light_migrations
 from app.db.session import Base, engine
 from app.models import category, task, user  # noqa: F401  (ensures models are registered)
 
 Base.metadata.create_all(bind=engine)
+run_light_migrations(engine)
 
 app = FastAPI(title="imsobusy API")
 

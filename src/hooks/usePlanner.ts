@@ -14,6 +14,7 @@ function mapTask(task: ApiTask): Task {
   return {
     id: task.id,
     title: task.title,
+    location: task.location,
     time: task.time,
     categoryId: task.category_id,
     done: task.done,
@@ -77,9 +78,15 @@ export function usePlanner(token: string) {
     setTasks((prev) => prev.map((task) => (task.id === id ? mapTask(updated) : task)));
   }
 
-  async function addTask(input: { title: string; time: string; categoryId: string }) {
+  async function addTask(input: {
+    title: string;
+    location: string;
+    time: string;
+    categoryId: string;
+  }) {
     const created = await api.createTask(token, {
       title: input.title,
+      location: input.location,
       time: input.time,
       category_id: input.categoryId,
       date: selectedISO,
@@ -89,10 +96,11 @@ export function usePlanner(token: string) {
 
   async function updateTask(
     id: string,
-    patch: { title: string; time: string; categoryId: string },
+    patch: { title: string; location: string; time: string; categoryId: string },
   ) {
     const updated = await api.updateTask(token, id, {
       title: patch.title,
+      location: patch.location,
       time: patch.time,
       category_id: patch.categoryId,
     });

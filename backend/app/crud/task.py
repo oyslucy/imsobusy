@@ -21,12 +21,18 @@ def create_task(
     owner_id: str,
     *,
     title: str,
+    location: str | None,
     time: str,
     category_id: str,
     date: date_type,
 ) -> Task:
     task = Task(
-        owner_id=owner_id, title=title, time=time, category_id=category_id, date=date
+        owner_id=owner_id,
+        title=title,
+        location=location,
+        time=time,
+        category_id=category_id,
+        date=date,
     )
     db.add(task)
     db.commit()

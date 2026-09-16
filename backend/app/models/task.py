@@ -17,6 +17,7 @@ class Task(Base):
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_new_id)
     owner_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
     title: Mapped[str] = mapped_column(String(200))
+    location: Mapped[str | None] = mapped_column(String(200), nullable=True)
     time: Mapped[str] = mapped_column(String(5))
     category_id: Mapped[str] = mapped_column(ForeignKey("categories.id"))
     done: Mapped[bool] = mapped_column(Boolean, default=False)

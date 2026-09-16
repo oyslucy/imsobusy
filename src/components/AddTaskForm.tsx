@@ -1,10 +1,16 @@
 import { useState, type FormEvent } from "react";
 import type { Category } from "@/types";
 import { CategoryPicker } from "@/components/CategoryPicker";
+import { TimePicker } from "@/components/TimePicker";
 
 interface AddTaskFormProps {
   categories: Category[];
-  onAdd: (input: { title: string; time: string; categoryId: string }) => Promise<void>;
+  onAdd: (input: {
+    title: string;
+    location: string;
+    time: string;
+    categoryId: string;
+  }) => Promise<void>;
   onCreateCategory: (label: string, swatchIndex: number) => Promise<Category>;
   onCancel: () => void;
 }
@@ -16,6 +22,7 @@ export function AddTaskForm({
   onCancel,
 }: AddTaskFormProps) {
   const [title, setTitle] = useState("");
+  const [location, setLocation] = useState("");
   const [time, setTime] = useState("09:00");
   const [categoryId, setCategoryId] = useState(categories[0]?.id ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,7 +33,7 @@ export function AddTaskForm({
     if (!trimmed || !categoryId) return;
     setIsSubmitting(true);
     try {
-      await onAdd({ title: trimmed, time, categoryId });
+      await onAdd({ title: trimmed, location: location.trim(), time, categoryId });
     } finally {
       setIsSubmitting(false);
     }
@@ -44,13 +51,14 @@ export function AddTaskForm({
         placeholder="일정 제목"
         className="rounded-lg border-2 border-ink px-3 py-2 text-sm font-semibold outline-none"
       />
+      <input
+        value={location}
+        onChange={(e) => setLocation(e.target.value)}
+        placeholder="위치 (선택)"
+        className="rounded-lg border-2 border-ink px-3 py-2 text-sm font-semibold outline-none"
+      />
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <input
-          type="time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          className="rounded-lg border-2 border-ink px-3 py-2 text-sm font-semibold outline-none"
-        />
+        <TimePicker value={time} onChange={setTime} />
         <CategoryPicker
           categories={categories}
           selectedId={categoryId}

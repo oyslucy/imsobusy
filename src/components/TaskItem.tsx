@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import type { Category, Task } from "@/types";
 import { CategoryPicker } from "@/components/CategoryPicker";
+import { TimePicker } from "@/components/TimePicker";
 
 interface TaskItemProps {
   task: Task;
@@ -8,7 +9,7 @@ interface TaskItemProps {
   onToggle: (id: string) => void;
   onUpdate: (
     id: string,
-    patch: { title: string; time: string; categoryId: string },
+    patch: { title: string; location: string; time: string; categoryId: string },
   ) => Promise<void>;
   onDelete: (id: string) => void;
   onCreateCategory: (label: string, swatchIndex: number) => Promise<Category>;
@@ -24,6 +25,7 @@ export function TaskItem({
 }: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(task.title);
+  const [location, setLocation] = useState(task.location ?? "");
   const [time, setTime] = useState(task.time);
   const [categoryId, setCategoryId] = useState(task.categoryId);
 
@@ -31,6 +33,7 @@ export function TaskItem({
 
   function startEdit() {
     setTitle(task.title);
+    setLocation(task.location ?? "");
     setTime(task.time);
     setCategoryId(task.categoryId);
     setIsEditing(true);
@@ -40,7 +43,7 @@ export function TaskItem({
     e.preventDefault();
     const trimmed = title.trim();
     if (!trimmed || !categoryId) return;
-    await onUpdate(task.id, { title: trimmed, time, categoryId });
+    await onUpdate(task.id, { title: trimmed, location: location.trim(), time, categoryId });
     setIsEditing(false);
   }
 
@@ -56,13 +59,14 @@ export function TaskItem({
           onChange={(e) => setTitle(e.target.value)}
           className="rounded-lg border-2 border-ink px-3 py-2 text-sm font-semibold outline-none"
         />
+        <input
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          placeholder="위치 (선택)"
+          className="rounded-lg border-2 border-ink px-3 py-2 text-sm font-semibold outline-none"
+        />
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <input
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            className="rounded-lg border-2 border-ink px-3 py-2 text-sm font-semibold outline-none"
-          />
+          <TimePicker value={time} onChange={setTime} />
           <CategoryPicker
             categories={categories}
             selectedId={categoryId}
@@ -113,6 +117,9 @@ export function TaskItem({
           }`}
         >
           {task.title}
+          {task.location && (
+            <span className="font-semibold text-neutral-400"> @ {task.location}</span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {category && (
