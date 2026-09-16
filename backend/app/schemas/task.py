@@ -11,6 +11,7 @@ class TaskRead(BaseModel):
     category_id: str
     done: bool
     date: DateType
+    position: int
 
     model_config = {"from_attributes": True}
 
@@ -30,3 +31,7 @@ class TaskUpdate(BaseModel):
     category_id: str | None = None
     done: bool | None = None
     date: DateType | None = None
+
+
+class TaskReorder(BaseModel):
+    task_ids: list[str] = Field(min_length=1)

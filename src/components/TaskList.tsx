@@ -1,3 +1,4 @@
+import { useState, type DragEvent } from "react";
 import type { Category, Task } from "@/types";
 import { TaskItem } from "@/components/TaskItem";
 
@@ -11,6 +12,8 @@ interface TaskListProps {
   ) => Promise<void>;
   onDelete: (id: string) => void;
   onCreateCategory: (label: string, swatchIndex: number) => Promise<Category>;
+  onReorder?: (orderedIds: string[]) => void;
+  canReorder?: boolean;
 }
 
 export function TaskList({
@@ -20,7 +23,12 @@ export function TaskList({
   onUpdate,
   onDelete,
   onCreateCategory,
+  onReorder,
+  canReorder,
 }: TaskListProps) {
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
+
   if (tasks.length === 0) {
     return (
       <div className="flex min-h-0 flex-1 items-center justify-center text-sm font-semibold text-neutral-400">
@@ -29,8 +37,25 @@ export function TaskList({
     );
   }
 
+  function handleDrop(e: DragEvent<HTMLDivElement>, targetId: string) {
+    e.preventDefault();
+    if (!dragId || dragId === targetId || !onReorder) {
+      setDragId(null);
+      setOverId(null);
+      return;
+    }
+    const ids = tasks.map((t) => t.id);
+    const from = ids.indexOf(dragId);
+    const to = ids.indexOf(targetId);
+    ids.splice(from, 1);
+    ids.splice(to, 0, dragId);
+    onReorder(ids);
+    setDragId(null);
+    setOverId(null);
+  }
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto">
+    <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
       {tasks.map((task) => (
         <TaskItem
           key={task.id}
@@ -40,6 +65,19 @@ export function TaskList({
           onUpdate={onUpdate}
           onDelete={onDelete}
           onCreateCategory={onCreateCategory}
+          draggable={canReorder}
+          isDragging={dragId === task.id}
+          isDragOver={overId === task.id && dragId !== null && dragId !== task.id}
+          onDragStart={() => setDragId(task.id)}
+          onDragOver={(e) => {
+            e.preventDefault();
+            if (overId !== task.id) setOverId(task.id);
+          }}
+          onDrop={(e) => handleDrop(e, task.id)}
+          onDragEnd={() => {
+            setDragId(null);
+            setOverId(null);
+          }}
         />
       ))}
     </div>

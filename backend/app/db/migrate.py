@@ -7,7 +7,25 @@ from sqlalchemy.engine import Engine
 # migration tool for a simple additive change.
 COLUMNS_TO_ENSURE: list[tuple[str, str, str]] = [
     ("tasks", "location", "VARCHAR(200)"),
+    ("tasks", "position", "INTEGER DEFAULT 0"),
 ]
+
+# Columns that need a one-time backfill right after they're first added,
+# so existing rows get a meaningful value instead of all sharing the
+# column's bare default.
+BACKFILL_AFTER_ADD: dict[tuple[str, str], str] = {
+    ("tasks", "position"): """
+        UPDATE tasks
+        SET position = ranked.rn
+        FROM (
+            SELECT id, ROW_NUMBER() OVER (
+                PARTITION BY owner_id, date ORDER BY rowid
+            ) - 1 AS rn
+            FROM tasks
+        ) AS ranked
+        WHERE tasks.id = ranked.id
+    """,
+}
 
 # Columns that used to be NOT NULL and now need to allow NULL. SQLite can't
 # drop a column constraint in place, so these tables get rebuilt: renamed
@@ -67,3 +85,6 @@ def run_light_migrations(engine: Engine) -> None:
             existing = {col["name"] for col in inspector.get_columns(table)}
             if column not in existing:
                 conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {ddl_type}"))
+                backfill_sql = BACKFILL_AFTER_ADD.get((table, column))
+                if backfill_sql:
+                    conn.execute(text(backfill_sql))

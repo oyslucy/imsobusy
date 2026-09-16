@@ -36,6 +36,7 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
     addTask,
     updateTask,
     deleteTask,
+    reorderTasks,
     addCategory,
     selectDate,
     goToMonth,
@@ -105,6 +106,8 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
                   onUpdate={updateTask}
                   onDelete={deleteTask}
                   onCreateCategory={addCategory}
+                  onReorder={reorderTasks}
+                  canReorder={filter === "all"}
                 />
               )}
 

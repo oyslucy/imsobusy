@@ -73,6 +73,7 @@ export interface ApiTask {
   category_id: string;
   done: boolean;
   date: string;
+  position: number;
 }
 
 export interface ApiTaskCreate {
@@ -137,4 +138,11 @@ export const api = {
 
   deleteTask: (token: string, id: string) =>
     request<void>(`/tasks/${id}`, { method: "DELETE" }, token),
+
+  reorderTasks: (token: string, taskIds: string[]) =>
+    request<ApiTask[]>(
+      "/tasks/reorder",
+      { method: "PATCH", body: JSON.stringify({ task_ids: taskIds }) },
+      token,
+    ),
 };

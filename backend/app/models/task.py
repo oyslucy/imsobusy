@@ -1,7 +1,7 @@
 import uuid
 from datetime import date as date_type
 
-from sqlalchemy import Boolean, Date, ForeignKey, String
+from sqlalchemy import Boolean, Date, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.session import Base
@@ -22,3 +22,4 @@ class Task(Base):
     category_id: Mapped[str] = mapped_column(ForeignKey("categories.id"))
     done: Mapped[bool] = mapped_column(Boolean, default=False)
     date: Mapped[date_type] = mapped_column(Date, index=True)
+    position: Mapped[int] = mapped_column(Integer, default=0)

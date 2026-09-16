@@ -112,6 +112,21 @@ export function usePlanner(token: string) {
     setTasks((prev) => prev.filter((task) => task.id !== id));
   }
 
+  async function reorderTasks(orderedIds: string[]) {
+    const idSet = new Set(orderedIds);
+    setTasks((prev) => {
+      const untouched = prev.filter((task) => !idSet.has(task.id));
+      const byId = new Map(prev.map((task) => [task.id, task]));
+      const reordered = orderedIds.map((id) => byId.get(id)).filter((t): t is Task => !!t);
+      return [...untouched, ...reordered];
+    });
+    try {
+      await api.reorderTasks(token, orderedIds);
+    } catch (err) {
+      console.error("순서를 저장하지 못했어요", err);
+    }
+  }
+
   async function addCategory(label: string, swatchIndex: number): Promise<Category> {
     const swatch = CATEGORY_PALETTE[swatchIndex % CATEGORY_PALETTE.length];
     const created = await api.createCategory(token, {
@@ -154,6 +169,7 @@ export function usePlanner(token: string) {
     addTask,
     updateTask,
     deleteTask,
+    reorderTasks,
     addCategory,
     selectDate,
     goToMonth,

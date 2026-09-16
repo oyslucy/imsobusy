@@ -3,10 +3,17 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
 from app.crud.category import get_category
-from app.crud.task import create_task, delete_task, get_task, list_tasks, save_task
+from app.crud.task import (
+    create_task,
+    delete_task,
+    get_task,
+    list_tasks,
+    reorder_tasks,
+    save_task,
+)
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.task import TaskCreate, TaskRead, TaskUpdate
+from app.schemas.task import TaskCreate, TaskRead, TaskReorder, TaskUpdate
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -54,6 +61,15 @@ def post_task(
         category_id=payload.category_id,
         date=payload.date,
     )
+
+
+@router.patch("/reorder", response_model=list[TaskRead])
+def patch_reorder(
+    payload: TaskReorder,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[TaskRead]:
+    return reorder_tasks(db, current_user.id, payload.task_ids)
 
 
 @router.patch("/{task_id}", response_model=TaskRead)

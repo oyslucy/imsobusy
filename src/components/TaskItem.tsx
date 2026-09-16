@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type DragEvent, type FormEvent } from "react";
 import type { Category, Task } from "@/types";
 import { CategoryPicker } from "@/components/CategoryPicker";
 import { TimePicker } from "@/components/TimePicker";
@@ -13,6 +13,13 @@ interface TaskItemProps {
   ) => Promise<void>;
   onDelete: (id: string) => void;
   onCreateCategory: (label: string, swatchIndex: number) => Promise<Category>;
+  draggable?: boolean;
+  isDragging?: boolean;
+  isDragOver?: boolean;
+  onDragStart?: (e: DragEvent<HTMLDivElement>) => void;
+  onDragOver?: (e: DragEvent<HTMLDivElement>) => void;
+  onDrop?: (e: DragEvent<HTMLDivElement>) => void;
+  onDragEnd?: (e: DragEvent<HTMLDivElement>) => void;
 }
 
 export function TaskItem({
@@ -22,6 +29,13 @@ export function TaskItem({
   onUpdate,
   onDelete,
   onCreateCategory,
+  draggable,
+  isDragging,
+  isDragOver,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
 }: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(task.title);
@@ -96,23 +110,31 @@ export function TaskItem({
 
   return (
     <div
-      className={`flex items-center gap-3 rounded-2xl border-2 border-ink bg-white px-4 py-3.5 ${
-        task.done ? "opacity-75" : ""
-      }`}
+      draggable={draggable}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
+      className={`flex items-center gap-2 rounded-xl border-2 bg-white px-3 py-2 transition-colors ${
+        isDragOver ? "border-[#4a3fa0]" : "border-ink"
+      } ${task.done ? "opacity-75" : ""} ${isDragging ? "opacity-40" : ""}`}
     >
+      {draggable && (
+        <span className="shrink-0 cursor-grab select-none text-sm text-neutral-300">⠿</span>
+      )}
       <button
         type="button"
         aria-label={task.done ? "완료 취소" : "완료로 표시"}
         onClick={() => onToggle(task.id)}
-        className={`flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md border-2 border-ink text-xs font-black ${
+        className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md border-2 border-ink text-[10px] font-black ${
           task.done ? "bg-yellow" : ""
         }`}
       >
         {task.done ? "✓" : ""}
       </button>
-      <div className="min-w-0 flex-1">
-        <div
-          className={`mb-1.5 truncate text-sm font-bold ${
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <span
+          className={`min-w-0 truncate text-xs font-bold ${
             task.done ? "text-neutral-400 line-through" : ""
           }`}
         >
@@ -120,25 +142,25 @@ export function TaskItem({
           {task.location && (
             <span className="font-semibold text-neutral-400"> @ {task.location}</span>
           )}
-        </div>
-        <div className="flex items-center gap-2">
-          {category && (
-            <span
-              style={{ backgroundColor: category.bg, color: category.text }}
-              className="rounded-md px-2 py-0.5 text-[9.5px] font-extrabold tracking-wide"
-            >
-              {category.label}
-            </span>
-          )}
-          {task.time && <span className="text-xs font-bold text-neutral-400">{task.time}</span>}
-        </div>
+        </span>
+        {category && (
+          <span
+            style={{ backgroundColor: category.bg, color: category.text }}
+            className="shrink-0 rounded-md px-1.5 py-0.5 text-[8.5px] font-extrabold tracking-wide"
+          >
+            {category.label}
+          </span>
+        )}
+        {task.time && (
+          <span className="shrink-0 text-[10.5px] font-bold text-neutral-400">{task.time}</span>
+        )}
       </div>
-      <div className="flex shrink-0 gap-1.5">
+      <div className="flex shrink-0 gap-1">
         <button
           type="button"
           aria-label="일정 수정"
           onClick={startEdit}
-          className="flex h-7 w-7 items-center justify-center rounded-md border-2 border-ink bg-white text-xs"
+          className="flex h-6 w-6 items-center justify-center rounded-md border-2 border-ink bg-white text-[10px]"
         >
           ✏️
         </button>
@@ -146,7 +168,7 @@ export function TaskItem({
           type="button"
           aria-label="일정 취소"
           onClick={() => onDelete(task.id)}
-          className="flex h-7 w-7 items-center justify-center rounded-md border-2 border-ink bg-white text-xs text-neutral-500"
+          className="flex h-6 w-6 items-center justify-center rounded-md border-2 border-ink bg-white text-[10px] text-neutral-500"
         >
           ✕
         </button>
