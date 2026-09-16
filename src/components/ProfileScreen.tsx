@@ -70,7 +70,7 @@ export function ProfileScreen({ user, onUpdate, onLogout }: ProfileScreenProps) 
         onSubmit={handleSave}
         className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1"
       >
-        <div className="flex justify-center gap-1.5">
+        <div className="flex flex-wrap justify-center gap-1.5">
           {AVATAR_OPTIONS.map((emoji) => (
             <button
               key={emoji}

@@ -59,9 +59,9 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
   ).length;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#dcdcdc] p-6">
-      <div className="flex h-[780px] w-full max-w-[1100px] overflow-hidden rounded-2xl border border-black shadow-2xl">
-        <div className="flex-[1.15] overflow-y-auto bg-cream p-7">
+    <div className="flex min-h-screen items-center justify-center bg-[#dcdcdc] p-3 sm:p-6">
+      <div className="flex w-full max-w-[1100px] flex-col overflow-hidden rounded-2xl border border-black shadow-2xl md:h-[780px] md:flex-row">
+        <div className="shrink-0 bg-cream p-4 sm:p-7 md:flex-[1.15] md:overflow-y-auto">
           <Brand />
           <Greeting name={user.name} remaining={pendingToday} />
           <CalendarCard
@@ -75,7 +75,7 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
           />
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col bg-panel p-7">
+        <div className="flex min-h-0 flex-col bg-panel p-4 sm:p-7 md:flex-1">
           {view === "home" ? (
             <>
               <div className="mb-1.5 flex items-baseline gap-3 font-serif">

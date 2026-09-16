@@ -70,9 +70,9 @@ export function CalendarCard({
   }
 
   return (
-    <div className="rounded-card border-[2.5px] border-ink bg-white p-[22px]">
-      <div className="mb-4 flex items-center justify-between">
-        <div className="text-[26px] font-extrabold">
+    <div className="rounded-card border-[2.5px] border-ink bg-white p-4 sm:p-[22px]">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="text-[22px] font-extrabold sm:text-[26px]">
           {month} <span className="ml-1 text-base font-bold text-neutral-400">{year}</span>
         </div>
         <div className="flex items-center gap-2">
