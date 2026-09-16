@@ -1,13 +1,15 @@
 import { useMemo, useState } from "react";
-import type { Task, TaskTag } from "@/types";
+import type { Category, Task } from "@/types";
 import { initialTasks } from "@/data/tasks";
 import { addMonths, toISODate } from "@/lib/calendar";
+import { CATEGORY_PALETTE, DEFAULT_CATEGORIES } from "@/lib/categories";
 
-export type FilterKey = "all" | TaskTag;
+export type FilterKey = "all" | string;
 
 export function usePlanner() {
   const today = useMemo(() => new Date(), []);
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [viewDate, setViewDate] = useState<Date>(today);
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [filter, setFilter] = useState<FilterKey>("all");
@@ -27,7 +29,7 @@ export function usePlanner() {
   const visibleTasks =
     filter === "all"
       ? tasksForSelectedDay
-      : tasksForSelectedDay.filter((task) => task.tag === filter);
+      : tasksForSelectedDay.filter((task) => task.categoryId === filter);
 
   const doneCount = tasksForSelectedDay.filter((task) => task.done).length;
   const totalCount = tasksForSelectedDay.length;
@@ -38,19 +40,22 @@ export function usePlanner() {
     );
   }
 
-  function addTask(input: { title: string; time: string; tag: TaskTag }) {
+  function addTask(input: { title: string; time: string; categoryId: string }) {
     const newTask: Task = {
       id: crypto.randomUUID(),
       title: input.title,
       time: input.time,
-      tag: input.tag,
+      categoryId: input.categoryId,
       done: false,
       date: selectedISO,
     };
     setTasks((prev) => [...prev, newTask]);
   }
 
-  function updateTask(id: string, patch: { title: string; time: string; tag: TaskTag }) {
+  function updateTask(
+    id: string,
+    patch: { title: string; time: string; categoryId: string },
+  ) {
     setTasks((prev) =>
       prev.map((task) => (task.id === id ? { ...task, ...patch } : task)),
     );
@@ -58,6 +63,18 @@ export function usePlanner() {
 
   function deleteTask(id: string) {
     setTasks((prev) => prev.filter((task) => task.id !== id));
+  }
+
+  function addCategory(label: string, swatchIndex: number): Category {
+    const swatch = CATEGORY_PALETTE[swatchIndex % CATEGORY_PALETTE.length];
+    const newCategory: Category = {
+      id: crypto.randomUUID(),
+      label,
+      bg: swatch.bg,
+      text: swatch.text,
+    };
+    setCategories((prev) => [...prev, newCategory]);
+    return newCategory;
   }
 
   function selectDate(date: Date) {
@@ -80,6 +97,7 @@ export function usePlanner() {
     selectedDate,
     filter,
     setFilter,
+    categories,
     tasksByDate,
     visibleTasks,
     doneCount,
@@ -88,6 +106,7 @@ export function usePlanner() {
     addTask,
     updateTask,
     deleteTask,
+    addCategory,
     selectDate,
     goToMonth,
   };

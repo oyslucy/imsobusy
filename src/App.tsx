@@ -17,6 +17,7 @@ export default function App() {
     selectedDate,
     filter,
     setFilter,
+    categories,
     tasksByDate,
     visibleTasks,
     doneCount,
@@ -25,6 +26,7 @@ export default function App() {
     addTask,
     updateTask,
     deleteTask,
+    addCategory,
     selectDate,
     goToMonth,
   } = usePlanner();
@@ -47,8 +49,8 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#dcdcdc] p-6">
-      <div className="flex w-full max-w-[1100px] overflow-hidden rounded-2xl border border-black shadow-2xl">
-        <div className="flex-[1.15] bg-cream p-7">
+      <div className="flex h-[780px] w-full max-w-[1100px] overflow-hidden rounded-2xl border border-black shadow-2xl">
+        <div className="flex-[1.15] overflow-y-auto bg-cream p-7">
           <Brand />
           <Greeting name="수아" remaining={pendingToday} />
           <CalendarCard
@@ -61,7 +63,7 @@ export default function App() {
           />
         </div>
 
-        <div className="flex flex-1 flex-col bg-panel p-7">
+        <div className="flex min-h-0 flex-1 flex-col bg-panel p-7">
           <div className="mb-1.5 flex items-baseline gap-3 font-serif">
             <div className="text-[52px] font-extrabold leading-none">
               {selectedDate.getDate()}
@@ -75,16 +77,23 @@ export default function App() {
           </div>
 
           <ProgressCard done={doneCount} total={totalCount} />
-          <FilterTabs active={filter} onChange={setFilter} />
+          <FilterTabs categories={categories} active={filter} onChange={setFilter} />
           <TaskList
             tasks={visibleTasks}
+            categories={categories}
             onToggle={toggleTask}
             onUpdate={updateTask}
             onDelete={deleteTask}
+            onCreateCategory={addCategory}
           />
 
           {isAdding ? (
-            <AddTaskForm onAdd={handleAddTask} onCancel={() => setIsAdding(false)} />
+            <AddTaskForm
+              categories={categories}
+              onAdd={handleAddTask}
+              onCreateCategory={addCategory}
+              onCancel={() => setIsAdding(false)}
+            />
           ) : (
             <button
               type="button"

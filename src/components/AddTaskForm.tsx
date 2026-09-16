@@ -1,22 +1,29 @@
 import { useState, type FormEvent } from "react";
-import type { TaskTag } from "@/types";
-import { TASK_TAGS } from "@/lib/taskTags";
+import type { Category } from "@/types";
+import { CategoryPicker } from "@/components/CategoryPicker";
 
 interface AddTaskFormProps {
-  onAdd: (input: { title: string; time: string; tag: TaskTag }) => void;
+  categories: Category[];
+  onAdd: (input: { title: string; time: string; categoryId: string }) => void;
+  onCreateCategory: (label: string, swatchIndex: number) => Category;
   onCancel: () => void;
 }
 
-export function AddTaskForm({ onAdd, onCancel }: AddTaskFormProps) {
+export function AddTaskForm({
+  categories,
+  onAdd,
+  onCreateCategory,
+  onCancel,
+}: AddTaskFormProps) {
   const [title, setTitle] = useState("");
   const [time, setTime] = useState("09:00");
-  const [tag, setTag] = useState<TaskTag>("work");
+  const [categoryId, setCategoryId] = useState(categories[0]?.id ?? "");
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const trimmed = title.trim();
-    if (!trimmed) return;
-    onAdd({ title: trimmed, time, tag });
+    if (!trimmed || !categoryId) return;
+    onAdd({ title: trimmed, time, categoryId });
   }
 
   return (
@@ -31,32 +38,24 @@ export function AddTaskForm({ onAdd, onCancel }: AddTaskFormProps) {
         placeholder="일정 제목"
         className="rounded-lg border-2 border-ink px-3 py-2 text-sm font-semibold outline-none"
       />
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <input
           type="time"
           value={time}
           onChange={(e) => setTime(e.target.value)}
           className="rounded-lg border-2 border-ink px-3 py-2 text-sm font-semibold outline-none"
         />
-        <div className="flex gap-1.5">
-          {TASK_TAGS.map((opt) => (
-            <button
-              key={opt.key}
-              type="button"
-              onClick={() => setTag(opt.key)}
-              className={`rounded-md px-2.5 py-1.5 text-[10.5px] font-extrabold tracking-wide ${
-                tag === opt.key ? opt.className : "bg-neutral-100 text-neutral-400"
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
+        <CategoryPicker
+          categories={categories}
+          selectedId={categoryId}
+          onSelect={setCategoryId}
+          onCreateCategory={onCreateCategory}
+        />
       </div>
       <div className="flex gap-2">
         <button
           type="submit"
-          disabled={!title.trim()}
+          disabled={!title.trim() || !categoryId}
           className="flex-1 rounded-lg border-2 border-ink bg-yellow py-2 text-sm font-extrabold disabled:opacity-40"
         >
           추가

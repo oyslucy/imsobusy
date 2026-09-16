@@ -11,6 +11,9 @@ export function getWeekdayLabels(): readonly string[] {
   return WEEKDAY_LABELS_KO;
 }
 
+/** Always renders 6 weeks so the card's height stays constant across months. */
+const CALENDAR_ROWS = 6;
+
 /** Builds a Monday-start month grid, leaving null for cells outside the month. */
 export function buildMonthMatrix(viewDate: Date): CalendarMatrix {
   const year = viewDate.getFullYear();
@@ -18,11 +21,10 @@ export function buildMonthMatrix(viewDate: Date): CalendarMatrix {
   const firstWeekday = new Date(year, month, 1).getDay(); // 0=Sun..6=Sat
   const offset = (firstWeekday + 6) % 7; // 0=Mon..6=Sun
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const rows = Math.ceil((offset + daysInMonth) / 7);
 
   const matrix: CalendarMatrix = [];
   let day = 1;
-  for (let r = 0; r < rows; r++) {
+  for (let r = 0; r < CALENDAR_ROWS; r++) {
     const row: (CalendarDay | null)[] = [];
     for (let c = 0; c < 7; c++) {
       const cellIndex = r * 7 + c;

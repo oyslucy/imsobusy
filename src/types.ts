@@ -1,10 +1,15 @@
-export type TaskTag = "work" | "life" | "move";
+export interface Category {
+  id: string;
+  label: string;
+  bg: string;
+  text: string;
+}
 
 export interface Task {
   id: string;
   title: string;
   time: string;
-  tag: TaskTag;
+  categoryId: string;
   done: boolean;
   /** ISO date string (yyyy-mm-dd) the task belongs to */
   date: string;

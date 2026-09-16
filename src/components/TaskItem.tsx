@@ -1,34 +1,43 @@
 import { useState, type FormEvent } from "react";
-import type { Task, TaskTag } from "@/types";
-import { TASK_TAGS } from "@/lib/taskTags";
+import type { Category, Task } from "@/types";
+import { CategoryPicker } from "@/components/CategoryPicker";
 
 interface TaskItemProps {
   task: Task;
+  categories: Category[];
   onToggle: (id: string) => void;
-  onUpdate: (id: string, patch: { title: string; time: string; tag: TaskTag }) => void;
+  onUpdate: (id: string, patch: { title: string; time: string; categoryId: string }) => void;
   onDelete: (id: string) => void;
+  onCreateCategory: (label: string, swatchIndex: number) => Category;
 }
 
-export function TaskItem({ task, onToggle, onUpdate, onDelete }: TaskItemProps) {
+export function TaskItem({
+  task,
+  categories,
+  onToggle,
+  onUpdate,
+  onDelete,
+  onCreateCategory,
+}: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(task.title);
   const [time, setTime] = useState(task.time);
-  const [tag, setTag] = useState<TaskTag>(task.tag);
+  const [categoryId, setCategoryId] = useState(task.categoryId);
 
-  const tagStyle = TASK_TAGS.find((t) => t.key === task.tag)!;
+  const category = categories.find((c) => c.id === task.categoryId);
 
   function startEdit() {
     setTitle(task.title);
     setTime(task.time);
-    setTag(task.tag);
+    setCategoryId(task.categoryId);
     setIsEditing(true);
   }
 
   function handleSave(e: FormEvent) {
     e.preventDefault();
     const trimmed = title.trim();
-    if (!trimmed) return;
-    onUpdate(task.id, { title: trimmed, time, tag });
+    if (!trimmed || !categoryId) return;
+    onUpdate(task.id, { title: trimmed, time, categoryId });
     setIsEditing(false);
   }
 
@@ -44,32 +53,24 @@ export function TaskItem({ task, onToggle, onUpdate, onDelete }: TaskItemProps) 
           onChange={(e) => setTitle(e.target.value)}
           className="rounded-lg border-2 border-ink px-3 py-2 text-sm font-semibold outline-none"
         />
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <input
             type="time"
             value={time}
             onChange={(e) => setTime(e.target.value)}
             className="rounded-lg border-2 border-ink px-3 py-2 text-sm font-semibold outline-none"
           />
-          <div className="flex gap-1.5">
-            {TASK_TAGS.map((opt) => (
-              <button
-                key={opt.key}
-                type="button"
-                onClick={() => setTag(opt.key)}
-                className={`rounded-md px-2.5 py-1.5 text-[10.5px] font-extrabold tracking-wide ${
-                  tag === opt.key ? opt.className : "bg-neutral-100 text-neutral-400"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
+          <CategoryPicker
+            categories={categories}
+            selectedId={categoryId}
+            onSelect={setCategoryId}
+            onCreateCategory={onCreateCategory}
+          />
         </div>
         <div className="flex gap-2">
           <button
             type="submit"
-            disabled={!title.trim()}
+            disabled={!title.trim() || !categoryId}
             className="flex-1 rounded-lg border-2 border-ink bg-yellow py-2 text-sm font-extrabold disabled:opacity-40"
           >
             저장
@@ -111,9 +112,14 @@ export function TaskItem({ task, onToggle, onUpdate, onDelete }: TaskItemProps) 
           {task.title}
         </div>
         <div className="flex items-center gap-2">
-          <span className={`rounded-md px-2 py-0.5 text-[9.5px] font-extrabold tracking-wide ${tagStyle.className}`}>
-            {tagStyle.label}
-          </span>
+          {category && (
+            <span
+              style={{ backgroundColor: category.bg, color: category.text }}
+              className="rounded-md px-2 py-0.5 text-[9.5px] font-extrabold tracking-wide"
+            >
+              {category.label}
+            </span>
+          )}
           <span className="text-xs font-bold text-neutral-400">{task.time}</span>
         </div>
       </div>
