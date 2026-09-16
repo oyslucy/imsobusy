@@ -1,5 +1,8 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.routes import auth, categories, tasks, users
 from app.core.config import settings
@@ -27,3 +30,11 @@ app.include_router(tasks.router, prefix="/api")
 @app.get("/api/health")
 def health_check() -> dict[str, str]:
     return {"status": "ok"}
+
+
+# Serve the built frontend (npm run build) so the whole app runs as a single
+# server. Mounted last so it never shadows the /api routes above. Absent
+# during frontend-less API development, where this is simply skipped.
+frontend_dist = Path(__file__).resolve().parent.parent.parent / "dist"
+if frontend_dist.is_dir():
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
