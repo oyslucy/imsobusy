@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 const MIN_O = 1;
-const MAX_O = 5;
+const MAX_O = 20;
 const STEP_MS = 260;
 
 function useOscillate(min: number, max: number, stepMs: number): number {
