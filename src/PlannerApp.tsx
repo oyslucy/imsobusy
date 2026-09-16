@@ -68,6 +68,7 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
             viewDate={viewDate}
             today={today}
             selectedDate={selectedDate}
+            categories={categories}
             tasksByDate={tasksByDate}
             onSelectDate={handleSelectDate}
             onGoToMonth={goToMonth}

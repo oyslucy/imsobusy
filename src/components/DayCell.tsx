@@ -1,11 +1,9 @@
 import type { CalendarDay } from "@/lib/calendar";
-import { seededCount } from "@/lib/calendar";
 
 interface DayCellProps {
   cell: CalendarDay | null;
   isToday: boolean;
   isSelected: boolean;
-  isPast: boolean;
   weekendKind: "sat" | "sun" | null;
   taskCount: number;
   allDone: boolean;
@@ -16,7 +14,6 @@ export function DayCell({
   cell,
   isToday,
   isSelected,
-  isPast,
   weekendKind,
   taskCount,
   allDone,
@@ -26,8 +23,7 @@ export function DayCell({
     return <div className="aspect-[1/0.92] w-full" />;
   }
 
-  const count = taskCount > 0 ? taskCount : seededCount(cell.day);
-  const showCheck = taskCount > 0 ? allDone : isPast;
+  const showCheck = taskCount > 0 && allDone;
 
   const stateClasses = isToday
     ? "border-ink bg-yellow text-[#2a2200]"
@@ -61,13 +57,15 @@ export function DayCell({
         </div>
       )}
       <div className={numberColor}>{cell.day}</div>
-      <div
-        className={`mt-0.5 text-[9.5px] font-bold tracking-widest ${
-          isToday || isSelected ? "text-neutral-400" : "text-[#5b52a0]"
-        }`}
-      >
-        · {count} ·
-      </div>
+      {taskCount > 0 && (
+        <div
+          className={`mt-0.5 text-[9.5px] font-bold tracking-widest ${
+            isToday || isSelected ? "text-neutral-400" : "text-[#5b52a0]"
+          }`}
+        >
+          · {taskCount} ·
+        </div>
+      )}
     </button>
   );
 }

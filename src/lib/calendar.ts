@@ -51,10 +51,6 @@ export function isSameDay(a: Date, b: Date): boolean {
   return toISODate(a) === toISODate(b);
 }
 
-export function isBeforeDay(a: Date, b: Date): boolean {
-  return toISODate(a) < toISODate(b);
-}
-
 export function addMonths(date: Date, delta: number): Date {
   return new Date(date.getFullYear(), date.getMonth() + delta, 1);
 }
@@ -71,7 +67,16 @@ export function monthLabel(date: Date): { month: string; year: string } {
   return { month, year };
 }
 
-/** Deterministic decorative count for days without real task data. */
-export function seededCount(day: number): number {
-  return ((day * 53) % 6) + 1;
+/** The Monday that starts the week containing this date. */
+export function startOfWeek(date: Date): Date {
+  const offset = (date.getDay() + 6) % 7; // 0=Mon..6=Sun
+  return addDays(date, -offset);
+}
+
+export function buildWeekDays(anchor: Date): CalendarDay[] {
+  const start = startOfWeek(anchor);
+  return Array.from({ length: 7 }, (_, i) => {
+    const date = addDays(start, i);
+    return { date, day: date.getDate() };
+  });
 }
