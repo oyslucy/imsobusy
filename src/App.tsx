@@ -23,6 +23,8 @@ export default function App() {
     totalCount,
     toggleTask,
     addTask,
+    updateTask,
+    deleteTask,
     selectDate,
     goToMonth,
   } = usePlanner();
@@ -74,7 +76,12 @@ export default function App() {
 
           <ProgressCard done={doneCount} total={totalCount} />
           <FilterTabs active={filter} onChange={setFilter} />
-          <TaskList tasks={visibleTasks} onToggle={toggleTask} />
+          <TaskList
+            tasks={visibleTasks}
+            onToggle={toggleTask}
+            onUpdate={updateTask}
+            onDelete={deleteTask}
+          />
 
           {isAdding ? (
             <AddTaskForm onAdd={handleAddTask} onCancel={() => setIsAdding(false)} />

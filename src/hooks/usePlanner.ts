@@ -50,6 +50,16 @@ export function usePlanner() {
     setTasks((prev) => [...prev, newTask]);
   }
 
+  function updateTask(id: string, patch: { title: string; time: string; tag: TaskTag }) {
+    setTasks((prev) =>
+      prev.map((task) => (task.id === id ? { ...task, ...patch } : task)),
+    );
+  }
+
+  function deleteTask(id: string) {
+    setTasks((prev) => prev.filter((task) => task.id !== id));
+  }
+
   function selectDate(date: Date) {
     setSelectedDate(date);
     if (
@@ -76,6 +86,8 @@ export function usePlanner() {
     totalCount,
     toggleTask,
     addTask,
+    updateTask,
+    deleteTask,
     selectDate,
     goToMonth,
   };
