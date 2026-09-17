@@ -115,26 +115,28 @@ export function TaskItem({
       onDragOver={onDragOver}
       onDrop={onDrop}
       onDragEnd={onDragEnd}
-      className={`flex items-center gap-2 rounded-xl border-2 bg-white px-3 py-2 transition-colors ${
+      className={`flex items-center gap-1.5 rounded-lg border-2 bg-white px-2.5 py-1 transition-colors ${
         isDragOver ? "border-[#4a3fa0]" : "border-ink"
       } ${task.done ? "opacity-75" : ""} ${isDragging ? "opacity-40" : ""}`}
     >
       {draggable && (
-        <span className="shrink-0 cursor-grab select-none text-sm text-neutral-300">⠿</span>
+        <span className="shrink-0 cursor-grab select-none text-xs leading-none text-neutral-300">
+          ⠿
+        </span>
       )}
       <button
         type="button"
         aria-label={task.done ? "완료 취소" : "완료로 표시"}
         onClick={() => onToggle(task.id)}
-        className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md border-2 border-ink text-[10px] font-black ${
+        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 border-ink text-[9px] font-black leading-none ${
           task.done ? "bg-yellow" : ""
         }`}
       >
         {task.done ? "✓" : ""}
       </button>
-      <div className="flex min-w-0 flex-1 items-center gap-2">
+      <div className="flex min-w-0 flex-1 items-center gap-1.5">
         <span
-          className={`min-w-0 truncate text-xs font-bold ${
+          className={`min-w-0 truncate text-[11px] font-bold leading-tight ${
             task.done ? "text-neutral-400 line-through" : ""
           }`}
         >
@@ -146,13 +148,15 @@ export function TaskItem({
         {category && (
           <span
             style={{ backgroundColor: category.bg, color: category.text }}
-            className="shrink-0 rounded-md px-1.5 py-0.5 text-[8.5px] font-extrabold tracking-wide"
+            className="shrink-0 rounded px-1.5 py-0.5 text-[8px] font-extrabold leading-none tracking-wide"
           >
             {category.label}
           </span>
         )}
         {task.time && (
-          <span className="shrink-0 text-[10.5px] font-bold text-neutral-400">{task.time}</span>
+          <span className="shrink-0 text-[10px] font-bold leading-none text-neutral-400">
+            {task.time}
+          </span>
         )}
       </div>
       <div className="flex shrink-0 gap-1">
@@ -160,7 +164,7 @@ export function TaskItem({
           type="button"
           aria-label="일정 수정"
           onClick={startEdit}
-          className="flex h-6 w-6 items-center justify-center rounded-md border-2 border-ink bg-white text-[10px]"
+          className="flex h-5 w-5 items-center justify-center rounded border-2 border-ink bg-white text-[9px] leading-none"
         >
           ✏️
         </button>
@@ -168,7 +172,7 @@ export function TaskItem({
           type="button"
           aria-label="일정 취소"
           onClick={() => onDelete(task.id)}
-          className="flex h-6 w-6 items-center justify-center rounded-md border-2 border-ink bg-white text-[10px] text-neutral-500"
+          className="flex h-5 w-5 items-center justify-center rounded border-2 border-ink bg-white text-[9px] leading-none text-neutral-500"
         >
           ✕
         </button>
