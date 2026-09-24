@@ -4,6 +4,7 @@ import { TaskItem } from "@/components/TaskItem";
 
 interface TaskListProps {
   tasks: Task[];
+  allTasks: Task[];
   categories: Category[];
   onToggle: (id: string) => void;
   onUpdate: (
@@ -18,6 +19,7 @@ interface TaskListProps {
 
 export function TaskList({
   tasks,
+  allTasks,
   categories,
   onToggle,
   onUpdate,
@@ -44,7 +46,7 @@ export function TaskList({
       setOverId(null);
       return;
     }
-    const ids = tasks.map((t) => t.id);
+    const ids = allTasks.map((t) => t.id);
     const from = ids.indexOf(dragId);
     const to = ids.indexOf(targetId);
     ids.splice(from, 1);

@@ -28,6 +28,7 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
     setFilter,
     categories,
     tasksByDate,
+    tasksForSelectedDay,
     visibleTasks,
     doneCount,
     totalCount,
@@ -101,13 +102,14 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
               ) : (
                 <TaskList
                   tasks={visibleTasks}
+                  allTasks={tasksForSelectedDay}
                   categories={categories}
                   onToggle={toggleTask}
                   onUpdate={updateTask}
                   onDelete={deleteTask}
                   onCreateCategory={addCategory}
                   onReorder={reorderTasks}
-                  canReorder={filter === "all"}
+                  canReorder
                 />
               )}
 

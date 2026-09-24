@@ -161,6 +161,7 @@ export function usePlanner(token: string) {
     setFilter,
     categories,
     tasksByDate,
+    tasksForSelectedDay,
     visibleTasks,
     doneCount,
     totalCount,
