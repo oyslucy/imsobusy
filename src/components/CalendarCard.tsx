@@ -110,13 +110,13 @@ export function CalendarCard({
       </div>
 
       {viewMode === "month" ? (
-        <table className="w-full border-collapse">
+        <table className="w-full table-fixed border-collapse">
           <thead>
             <tr>
               {weekdayLabels.map((label, i) => (
                 <th
                   key={label}
-                  className={`pb-2 text-center text-[12.5px] font-bold ${
+                  className={`w-[14.2857%] pb-2 text-center text-[12.5px] font-bold ${
                     i === 6 ? "text-coral" : "text-neutral-500"
                   }`}
                 >
