@@ -9,6 +9,29 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build frontend
+        run: |
+          npm ci
+          npm run build
+          tar -czf dist.tar.gz -C dist .
+
+      - name: Upload built frontend
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ubuntu
+          key: ${{ secrets.VM_SSH_KEY }}
+          source: "dist.tar.gz"
+          target: "~/imsobuzy"
+
       - name: Deploy to Oracle VM
         uses: appleboy/ssh-action@v1
         with:
@@ -19,5 +42,9 @@ jobs:
             cd ~/imsobuzy
             git fetch origin main
             git reset --hard origin/main
+            rm -rf dist
+            mkdir dist
+            tar -xzf dist.tar.gz -C dist
+            rm dist.tar.gz
             docker compose up -d --build
             docker image prune -f
