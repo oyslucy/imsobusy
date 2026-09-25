@@ -71,6 +71,32 @@ export function usePlanner(token: string) {
   const doneCount = tasksForSelectedDay.filter((task) => task.done).length;
   const totalCount = tasksForSelectedDay.length;
 
+  const viewMonthKey = `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, "0")}`;
+  const monthTasks = useMemo(
+    () => tasks.filter((task) => task.date.startsWith(viewMonthKey)),
+    [tasks, viewMonthKey],
+  );
+  const monthDoneCount = monthTasks.filter((task) => task.done).length;
+  const monthTotalCount = monthTasks.length;
+
+  const categoryStats = useMemo(() => {
+    const counts = new Map<string, { total: number; done: number }>();
+    for (const task of monthTasks) {
+      const entry = counts.get(task.categoryId) ?? { total: 0, done: 0 };
+      entry.total += 1;
+      if (task.done) entry.done += 1;
+      counts.set(task.categoryId, entry);
+    }
+    return categories
+      .map((category) => ({
+        category,
+        total: counts.get(category.id)?.total ?? 0,
+        done: counts.get(category.id)?.done ?? 0,
+      }))
+      .filter((entry) => entry.total > 0)
+      .sort((a, b) => b.total - a.total);
+  }, [monthTasks, categories]);
+
   async function toggleTask(id: string) {
     const target = tasks.find((task) => task.id === id);
     if (!target) return;
@@ -165,6 +191,9 @@ export function usePlanner(token: string) {
     visibleTasks,
     doneCount,
     totalCount,
+    monthDoneCount,
+    monthTotalCount,
+    categoryStats,
     isLoading,
     toggleTask,
     addTask,
