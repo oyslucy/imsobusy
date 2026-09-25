@@ -8,6 +8,7 @@ import { TaskList } from "@/components/TaskList";
 import { AddTaskForm } from "@/components/AddTaskForm";
 import { Navbar, type NavView } from "@/components/Navbar";
 import { ProfileScreen } from "@/components/ProfileScreen";
+import { BoardScreen } from "@/components/BoardScreen";
 import { usePlanner } from "@/hooks/usePlanner";
 import { toISODate } from "@/lib/calendar";
 import type { AuthUser, ProfilePatch } from "@/lib/api";
@@ -32,6 +33,9 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
     visibleTasks,
     doneCount,
     totalCount,
+    monthDoneCount,
+    monthTotalCount,
+    categoryStats,
     isLoading,
     toggleTask,
     addTask,
@@ -131,6 +135,13 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
                   </button>
                 ))}
             </>
+          ) : view === "board" ? (
+            <BoardScreen
+              viewDate={viewDate}
+              doneCount={monthDoneCount}
+              totalCount={monthTotalCount}
+              categoryStats={categoryStats}
+            />
           ) : (
             <ProfileScreen user={user} onUpdate={onUpdateProfile} onLogout={onLogout} />
           )}
