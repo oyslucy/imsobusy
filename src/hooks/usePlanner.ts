@@ -171,6 +171,10 @@ export function usePlanner(token: string) {
     ]);
   }
 
+  function insertTask(task: ApiTask) {
+    setTasks((prev) => [...prev, mapTask(task)]);
+  }
+
   async function addCategory(label: string, swatchIndex: number): Promise<Category> {
     const swatch = CATEGORY_PALETTE[swatchIndex % CATEGORY_PALETTE.length];
     const created = await api.createCategory(token, {
@@ -220,6 +224,7 @@ export function usePlanner(token: string) {
     deleteTask,
     reorderTasks,
     moveTasks,
+    insertTask,
     addCategory,
     selectDate,
     goToMonth,

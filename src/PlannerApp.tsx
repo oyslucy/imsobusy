@@ -10,9 +10,13 @@ import { Navbar, type NavView } from "@/components/Navbar";
 import { ProfileScreen } from "@/components/ProfileScreen";
 import { BoardScreen } from "@/components/BoardScreen";
 import { CarryOverScreen } from "@/components/CarryOverScreen";
+import { AlertsScreen } from "@/components/AlertsScreen";
+import { SendTaskDialog } from "@/components/SendTaskDialog";
 import { usePlanner } from "@/hooks/usePlanner";
+import { useFriends } from "@/hooks/useFriends";
 import { toISODate } from "@/lib/calendar";
 import type { AuthUser, ProfilePatch } from "@/lib/api";
+import type { Task } from "@/types";
 
 interface PlannerAppProps {
   user: AuthUser;
@@ -45,6 +49,7 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
     deleteTask,
     reorderTasks,
     moveTasks,
+    insertTask,
     addCategory,
     selectDate,
     goToMonth,
@@ -52,6 +57,18 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
 
   const [isAdding, setIsAdding] = useState(false);
   const [view, setView] = useState<NavView>("home");
+  const [sharingTask, setSharingTask] = useState<Task | null>(null);
+  const friends = useFriends(token);
+
+  function handleNavigate(next: NavView) {
+    // Pick up requests and shared tasks that arrived since the last load.
+    if (next === "alerts") friends.refresh();
+    setView(next);
+  }
+
+  async function handleAcceptShared(id: string, categoryId: string) {
+    insertTask(await friends.acceptShared(id, categoryId));
+  }
 
   function handleSelectDate(date: Date) {
     setIsAdding(false);
@@ -114,6 +131,7 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
                   onToggle={toggleTask}
                   onUpdate={updateTask}
                   onDelete={deleteTask}
+                  onShare={setSharingTask}
                   onCreateCategory={addCategory}
                   onReorder={reorderTasks}
                   canReorder
@@ -145,6 +163,20 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
               totalCount={monthTotalCount}
               categoryStats={categoryStats}
             />
+          ) : view === "alerts" ? (
+            <AlertsScreen
+              friends={friends.friends}
+              requests={friends.requests}
+              inbox={friends.inbox}
+              categories={categories}
+              onSendRequest={friends.sendFriendRequest}
+              onAcceptRequest={friends.acceptRequest}
+              onDeclineRequest={friends.declineRequest}
+              onRemoveFriend={friends.removeFriend}
+              onAcceptShared={handleAcceptShared}
+              onDeclineShared={friends.declineShared}
+              onCreateCategory={addCategory}
+            />
           ) : view === "carry" ? (
             <CarryOverScreen
               today={today}
@@ -157,9 +189,25 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
             <ProfileScreen user={user} onUpdate={onUpdateProfile} onLogout={onLogout} />
           )}
 
-          <Navbar active={view} onNavigate={setView} />
+          <Navbar
+            active={view}
+            onNavigate={handleNavigate}
+            badges={{
+              alerts: friends.requests.length + friends.inbox.length,
+              carry: overdueTasks.length,
+            }}
+          />
         </div>
       </div>
+
+      {sharingTask && (
+        <SendTaskDialog
+          task={sharingTask}
+          friends={friends.friends}
+          onSend={friends.shareTask}
+          onClose={() => setSharingTask(null)}
+        />
+      )}
     </div>
   );
 }

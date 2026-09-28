@@ -12,6 +12,7 @@ interface TaskItemProps {
     patch: { title: string; location: string; time: string | null; categoryId: string },
   ) => Promise<void>;
   onDelete: (id: string) => void;
+  onShare?: (task: Task) => void;
   onCreateCategory: (label: string, swatchIndex: number) => Promise<Category>;
   draggable?: boolean;
   isDragging?: boolean;
@@ -28,6 +29,7 @@ export function TaskItem({
   onToggle,
   onUpdate,
   onDelete,
+  onShare,
   onCreateCategory,
   draggable,
   isDragging,
@@ -160,6 +162,16 @@ export function TaskItem({
         )}
       </div>
       <div className="flex shrink-0 gap-1">
+        {onShare && (
+          <button
+            type="button"
+            aria-label="친구에게 보내기"
+            onClick={() => onShare(task)}
+            className="flex h-5 w-5 items-center justify-center rounded border-2 border-ink bg-white text-[9px] leading-none"
+          >
+            ➤
+          </button>
+        )}
         <button
           type="button"
           aria-label="일정 수정"

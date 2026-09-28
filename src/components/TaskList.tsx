@@ -12,6 +12,7 @@ interface TaskListProps {
     patch: { title: string; location: string; time: string | null; categoryId: string },
   ) => Promise<void>;
   onDelete: (id: string) => void;
+  onShare?: (task: Task) => void;
   onCreateCategory: (label: string, swatchIndex: number) => Promise<Category>;
   onReorder?: (orderedIds: string[]) => void;
   canReorder?: boolean;
@@ -24,6 +25,7 @@ export function TaskList({
   onToggle,
   onUpdate,
   onDelete,
+  onShare,
   onCreateCategory,
   onReorder,
   canReorder,
@@ -66,6 +68,7 @@ export function TaskList({
           onToggle={onToggle}
           onUpdate={onUpdate}
           onDelete={onDelete}
+          onShare={onShare}
           onCreateCategory={onCreateCategory}
           draggable={canReorder}
           isDragging={dragId === task.id}

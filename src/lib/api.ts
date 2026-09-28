@@ -93,6 +93,29 @@ export interface ApiTaskPatch {
   date?: string;
 }
 
+export interface ApiFriend {
+  id: string;
+  name: string;
+  email: string;
+  avatar_emoji: string;
+}
+
+export interface ApiFriendRequest {
+  id: string;
+  requester: ApiFriend;
+  created_at: string;
+}
+
+export interface ApiSharedTask {
+  id: string;
+  sender: ApiFriend;
+  title: string;
+  location: string | null;
+  time: string | null;
+  date: string;
+  created_at: string;
+}
+
 export const api = {
   signup: (input: { name: string; email: string; password: string }) =>
     request<AuthResponse>("/auth/signup", {
@@ -152,4 +175,44 @@ export const api = {
       { method: "PATCH", body: JSON.stringify({ task_ids: taskIds, date }) },
       token,
     ),
+
+  listFriends: (token: string) => request<ApiFriend[]>("/friends", {}, token),
+
+  listFriendRequests: (token: string) =>
+    request<ApiFriendRequest[]>("/friends/requests", {}, token),
+
+  sendFriendRequest: (token: string, email: string) =>
+    request<void>(
+      "/friends/requests",
+      { method: "POST", body: JSON.stringify({ email }) },
+      token,
+    ),
+
+  acceptFriendRequest: (token: string, id: string) =>
+    request<void>(`/friends/requests/${id}/accept`, { method: "POST" }, token),
+
+  declineFriendRequest: (token: string, id: string) =>
+    request<void>(`/friends/requests/${id}/decline`, { method: "POST" }, token),
+
+  removeFriend: (token: string, friendId: string) =>
+    request<void>(`/friends/${friendId}`, { method: "DELETE" }, token),
+
+  shareTask: (token: string, taskId: string, recipientId: string) =>
+    request<void>(
+      "/shared-tasks",
+      { method: "POST", body: JSON.stringify({ task_id: taskId, recipient_id: recipientId }) },
+      token,
+    ),
+
+  listSharedInbox: (token: string) => request<ApiSharedTask[]>("/shared-tasks/inbox", {}, token),
+
+  acceptSharedTask: (token: string, id: string, categoryId: string) =>
+    request<ApiTask>(
+      `/shared-tasks/${id}/accept`,
+      { method: "POST", body: JSON.stringify({ category_id: categoryId }) },
+      token,
+    ),
+
+  declineSharedTask: (token: string, id: string) =>
+    request<void>(`/shared-tasks/${id}/decline`, { method: "POST" }, token),
 };

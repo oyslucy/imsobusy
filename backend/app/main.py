@@ -4,11 +4,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.api.routes import auth, categories, tasks, users
+from app.api.routes import auth, categories, friends, shared_tasks, tasks, users
 from app.core.config import settings
 from app.db.migrate import run_light_migrations
 from app.db.session import Base, engine
-from app.models import category, task, user  # noqa: F401  (ensures models are registered)
+from app.models import category, friendship, shared_task, task, user  # noqa: F401  (ensures models are registered)
 
 Base.metadata.create_all(bind=engine)
 run_light_migrations(engine)
@@ -27,6 +27,8 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(users.router, prefix="/api")
 app.include_router(categories.router, prefix="/api")
 app.include_router(tasks.router, prefix="/api")
+app.include_router(friends.router, prefix="/api")
+app.include_router(shared_tasks.router, prefix="/api")
 
 
 @app.get("/api/health")
