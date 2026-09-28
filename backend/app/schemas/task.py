@@ -35,3 +35,8 @@ class TaskUpdate(BaseModel):
 
 class TaskReorder(BaseModel):
     task_ids: list[str] = Field(min_length=1)
+
+
+class TaskMove(BaseModel):
+    task_ids: list[str] = Field(min_length=1)
+    date: DateType

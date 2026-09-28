@@ -9,6 +9,7 @@ import { AddTaskForm } from "@/components/AddTaskForm";
 import { Navbar, type NavView } from "@/components/Navbar";
 import { ProfileScreen } from "@/components/ProfileScreen";
 import { BoardScreen } from "@/components/BoardScreen";
+import { CarryOverScreen } from "@/components/CarryOverScreen";
 import { usePlanner } from "@/hooks/usePlanner";
 import { toISODate } from "@/lib/calendar";
 import type { AuthUser, ProfilePatch } from "@/lib/api";
@@ -36,12 +37,14 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
     monthDoneCount,
     monthTotalCount,
     categoryStats,
+    overdueTasks,
     isLoading,
     toggleTask,
     addTask,
     updateTask,
     deleteTask,
     reorderTasks,
+    moveTasks,
     addCategory,
     selectDate,
     goToMonth,
@@ -141,6 +144,14 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
               doneCount={monthDoneCount}
               totalCount={monthTotalCount}
               categoryStats={categoryStats}
+            />
+          ) : view === "carry" ? (
+            <CarryOverScreen
+              today={today}
+              tasks={overdueTasks}
+              categories={categories}
+              onMove={moveTasks}
+              onDelete={deleteTask}
             />
           ) : (
             <ProfileScreen user={user} onUpdate={onUpdateProfile} onLogout={onLogout} />

@@ -97,6 +97,15 @@ export function usePlanner(token: string) {
       .sort((a, b) => b.total - a.total);
   }, [monthTasks, categories]);
 
+  const todayISO = toISODate(today);
+  const overdueTasks = useMemo(
+    () =>
+      tasks
+        .filter((task) => !task.done && task.date < todayISO)
+        .sort((a, b) => a.date.localeCompare(b.date)),
+    [tasks, todayISO],
+  );
+
   async function toggleTask(id: string) {
     const target = tasks.find((task) => task.id === id);
     if (!target) return;
@@ -153,6 +162,15 @@ export function usePlanner(token: string) {
     }
   }
 
+  async function moveTasks(ids: string[], date: string) {
+    const moved = await api.moveTasks(token, ids, date);
+    const movedIds = new Set(moved.map((task) => task.id));
+    setTasks((prev) => [
+      ...prev.filter((task) => !movedIds.has(task.id)),
+      ...moved.map(mapTask),
+    ]);
+  }
+
   async function addCategory(label: string, swatchIndex: number): Promise<Category> {
     const swatch = CATEGORY_PALETTE[swatchIndex % CATEGORY_PALETTE.length];
     const created = await api.createCategory(token, {
@@ -194,12 +212,14 @@ export function usePlanner(token: string) {
     monthDoneCount,
     monthTotalCount,
     categoryStats,
+    overdueTasks,
     isLoading,
     toggleTask,
     addTask,
     updateTask,
     deleteTask,
     reorderTasks,
+    moveTasks,
     addCategory,
     selectDate,
     goToMonth,

@@ -145,4 +145,11 @@ export const api = {
       { method: "PATCH", body: JSON.stringify({ task_ids: taskIds }) },
       token,
     ),
+
+  moveTasks: (token: string, taskIds: string[], date: string) =>
+    request<ApiTask[]>(
+      "/tasks/move",
+      { method: "PATCH", body: JSON.stringify({ task_ids: taskIds, date }) },
+      token,
+    ),
 };

@@ -1,15 +1,15 @@
-export type NavView = "home" | "board" | "profile";
+export type NavView = "home" | "board" | "carry" | "profile";
 
-const NAV_ITEMS: { key: NavView | "alerts" | "send"; icon: string }[] = [
+const NAV_ITEMS: { key: NavView | "alerts"; icon: string }[] = [
   { key: "home", icon: "🏠" },
   { key: "board", icon: "▦" },
   { key: "alerts", icon: "🔔" },
-  { key: "send", icon: "➤" },
+  { key: "carry", icon: "➤" },
   { key: "profile", icon: "👤" },
 ];
 
 function isNavView(key: string): key is NavView {
-  return key === "home" || key === "board" || key === "profile";
+  return key === "home" || key === "board" || key === "carry" || key === "profile";
 }
 
 interface NavbarProps {

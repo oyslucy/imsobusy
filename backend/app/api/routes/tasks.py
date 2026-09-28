@@ -8,12 +8,13 @@ from app.crud.task import (
     delete_task,
     get_task,
     list_tasks,
+    move_tasks,
     reorder_tasks,
     save_task,
 )
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.task import TaskCreate, TaskRead, TaskReorder, TaskUpdate
+from app.schemas.task import TaskCreate, TaskMove, TaskRead, TaskReorder, TaskUpdate
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -70,6 +71,15 @@ def patch_reorder(
     db: Session = Depends(get_db),
 ) -> list[TaskRead]:
     return reorder_tasks(db, current_user.id, payload.task_ids)
+
+
+@router.patch("/move", response_model=list[TaskRead])
+def patch_move(
+    payload: TaskMove,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[TaskRead]:
+    return move_tasks(db, current_user.id, payload.task_ids, payload.date)
 
 
 @router.patch("/{task_id}", response_model=TaskRead)
