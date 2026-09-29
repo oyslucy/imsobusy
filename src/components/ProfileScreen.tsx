@@ -4,6 +4,21 @@ import { ApiError } from "@/lib/api";
 
 const AVATAR_OPTIONS = ["🙂", "🐱", "🐶", "🌟", "🍀", "🔥", "🎧", "📚"];
 
+const MORE_EMOJIS = [
+  "😎", "🥳", "😺", "🐰", "🐻", "🐼", "🦊", "🐸",
+  "🐥", "🦄", "🐳", "🌈", "🌸", "🌻", "🍓", "🍑",
+  "🍩", "☕", "🍺", "⚽", "🏀", "🎮", "🎨", "🎸",
+  "✈️", "🚀", "💎", "💡", "💪", "👍", "❤️", "💯",
+  "✅", "⭐", "🎉", "🏆", "📌", "✨", "🌙", "☀️",
+];
+
+/** Returns the first emoji in the text, or null when it doesn't start with one. */
+function firstEmoji(text: string): string | null {
+  const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+  const first = segmenter.segment(text.trim())[Symbol.iterator]().next().value?.segment;
+  return first && /\p{Extended_Pictographic}|\p{Regional_Indicator}/u.test(first) ? first : null;
+}
+
 interface ProfileScreenProps {
   user: AuthUser;
   onUpdate: (patch: ProfilePatch) => Promise<AuthUser>;
@@ -21,6 +36,28 @@ export function ProfileScreen({ user, onUpdate, onLogout }: ProfileScreenProps) 
     null,
   );
   const [isSaving, setIsSaving] = useState(false);
+  const [isPickingMore, setIsPickingMore] = useState(false);
+  const [customEmoji, setCustomEmoji] = useState("");
+
+  const avatarChoices = AVATAR_OPTIONS.includes(avatarEmoji)
+    ? AVATAR_OPTIONS
+    : [...AVATAR_OPTIONS, avatarEmoji];
+
+  function pickEmoji(emoji: string) {
+    setAvatarEmoji(emoji);
+    setIsPickingMore(false);
+    setCustomEmoji("");
+  }
+
+  function handleCustomEmoji() {
+    const emoji = firstEmoji(customEmoji);
+    if (!emoji) {
+      setMessage({ type: "error", text: "이모티콘 하나를 입력해주세요" });
+      return;
+    }
+    setMessage(null);
+    pickEmoji(emoji);
+  }
 
   async function handleSave(e: FormEvent) {
     e.preventDefault();
@@ -71,11 +108,11 @@ export function ProfileScreen({ user, onUpdate, onLogout }: ProfileScreenProps) 
         className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1"
       >
         <div className="flex flex-wrap justify-center gap-1.5">
-          {AVATAR_OPTIONS.map((emoji) => (
+          {avatarChoices.map((emoji) => (
             <button
               key={emoji}
               type="button"
-              onClick={() => setAvatarEmoji(emoji)}
+              onClick={() => pickEmoji(emoji)}
               aria-label={`아바타 ${emoji}`}
               className={`flex h-10 w-10 items-center justify-center rounded-full border-2 text-lg ${
                 avatarEmoji === emoji ? "border-ink bg-yellow" : "border-transparent bg-white"
@@ -84,6 +121,62 @@ export function ProfileScreen({ user, onUpdate, onLogout }: ProfileScreenProps) 
               {emoji}
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => setIsPickingMore((prev) => !prev)}
+            aria-label="다른 이모티콘 선택"
+            className={`flex h-10 w-10 items-center justify-center rounded-full border-2 border-dashed border-ink text-lg font-bold ${
+              isPickingMore ? "bg-yellow" : "bg-white"
+            }`}
+          >
+            +
+          </button>
+        </div>
+
+        {isPickingMore && (
+          <div className="rounded-2xl border-2 border-ink bg-white p-3">
+            <div className="mb-2 grid grid-cols-8 gap-1">
+              {MORE_EMOJIS.map((emoji) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  onClick={() => pickEmoji(emoji)}
+                  aria-label={`아바타 ${emoji}`}
+                  className={`flex aspect-square items-center justify-center rounded-lg text-lg hover:bg-[#eee3f5] ${
+                    avatarEmoji === emoji ? "bg-yellow" : ""
+                  }`}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                value={customEmoji}
+                onChange={(e) => setCustomEmoji(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleCustomEmoji();
+                  }
+                }}
+                placeholder="직접 입력 (예: 🦖)"
+                className="min-w-0 flex-1 rounded-lg border-2 border-ink px-3 py-1.5 text-sm font-semibold outline-none"
+              />
+              <button
+                type="button"
+                onClick={handleCustomEmoji}
+                disabled={!customEmoji.trim()}
+                className="shrink-0 rounded-lg border-2 border-ink bg-yellow px-3 text-sm font-extrabold disabled:opacity-40"
+              >
+                선택
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="text-center text-[11px] font-semibold text-neutral-400">
+          고른 이모티콘은 할 일을 완료했을 때 체크 대신 표시돼요
         </div>
 
         <label className="text-xs font-bold text-neutral-500">이름</label>

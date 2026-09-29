@@ -6,6 +6,7 @@ import { TimePicker } from "@/components/TimePicker";
 interface TaskItemProps {
   task: Task;
   categories: Category[];
+  doneEmoji?: string;
   onToggle: (id: string) => void;
   onUpdate: (
     id: string,
@@ -26,6 +27,7 @@ interface TaskItemProps {
 export function TaskItem({
   task,
   categories,
+  doneEmoji = "✓",
   onToggle,
   onUpdate,
   onDelete,
@@ -130,11 +132,11 @@ export function TaskItem({
         type="button"
         aria-label={task.done ? "완료 취소" : "완료로 표시"}
         onClick={() => onToggle(task.id)}
-        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 border-ink text-[9px] font-black leading-none ${
-          task.done ? "bg-yellow" : ""
+        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 border-ink font-black leading-none ${
+          task.done ? "bg-yellow text-[11px]" : "text-[9px]"
         }`}
       >
-        {task.done ? "✓" : ""}
+        {task.done ? doneEmoji : ""}
       </button>
       <div className="flex min-w-0 flex-1 items-center gap-1.5">
         <span

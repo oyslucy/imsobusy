@@ -128,6 +128,7 @@ export function PlannerApp({ user, token, onLogout, onUpdateProfile }: PlannerAp
                   tasks={visibleTasks}
                   allTasks={tasksForSelectedDay}
                   categories={categories}
+                  doneEmoji={user.avatar_emoji}
                   onToggle={toggleTask}
                   onUpdate={updateTask}
                   onDelete={deleteTask}

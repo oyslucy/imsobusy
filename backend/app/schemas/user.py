@@ -18,6 +18,6 @@ class UserUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=100)
     email: EmailStr | None = None
     bio: str | None = Field(default=None, max_length=200)
-    avatar_emoji: str | None = Field(default=None, min_length=1, max_length=8)
+    avatar_emoji: str | None = Field(default=None, min_length=1, max_length=16)
     current_password: str | None = None
     new_password: str | None = Field(default=None, min_length=8, max_length=100)

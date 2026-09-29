@@ -23,5 +23,5 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(255))
     name: Mapped[str] = mapped_column(String(100))
     bio: Mapped[str | None] = mapped_column(String(200), nullable=True)
-    avatar_emoji: Mapped[str] = mapped_column(String(8), default="🙂")
+    avatar_emoji: Mapped[str] = mapped_column(String(16), default="🙂")
     created_at: Mapped[datetime] = mapped_column(default=_now)

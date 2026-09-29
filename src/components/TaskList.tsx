@@ -6,6 +6,7 @@ interface TaskListProps {
   tasks: Task[];
   allTasks: Task[];
   categories: Category[];
+  doneEmoji?: string;
   onToggle: (id: string) => void;
   onUpdate: (
     id: string,
@@ -22,6 +23,7 @@ export function TaskList({
   tasks,
   allTasks,
   categories,
+  doneEmoji,
   onToggle,
   onUpdate,
   onDelete,
@@ -65,6 +67,7 @@ export function TaskList({
           key={task.id}
           task={task}
           categories={categories}
+          doneEmoji={doneEmoji}
           onToggle={onToggle}
           onUpdate={onUpdate}
           onDelete={onDelete}
